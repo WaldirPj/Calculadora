@@ -1,0 +1,145 @@
+import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
+
+void main() {
+  runApp(const Calc());
+}
+
+class Calc extends StatelessWidget {
+  const Calc({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String display = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Calculadora',
+        ),
+        backgroundColor: Colors.black,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Display Da Calculadora
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: const Color.fromARGB(255, 1, 22, 33),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      display.toString(),
+                      style: const TextStyle(fontSize: 30, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 4,
+            mainAxisSpacing: 1,
+            crossAxisSpacing: 1,
+            children: [
+              botao('AC', colorText: Colors.orange),
+              botao('+/-', colorText: Colors.orange),
+              botao('%', colorText: Colors.orange),
+              botao('/', colorText: Colors.orange),
+              botao('7', valor: '7'),
+              botao('8', valor: '8'),
+              botao('9', valor: '9'),
+              botao('x', colorText: Colors.orange),
+              botao('4', valor: '4'),
+              botao('5', valor: '5'),
+              botao('6', valor: '6'),
+              botao('-', colorText: Colors.orange),
+              botao('1', valor: '1'),
+              botao('2', valor: '2'),
+              botao('3', valor: '3'),
+              botao('+', colorText: Colors.orange),
+              botao(''),
+              botao('0', valor: '0'),
+              botao('.'),
+              botao('=', colorText: Colors.orange),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  botao(String? nome,
+      {Color color = Colors.black,
+      Color colorText = Colors.white,
+      String? valor}) {
+    return GestureDetector(
+      child: Container(
+        alignment: Alignment.center,
+        height: 30,
+        width: 30,
+        color: color,
+        child: Text(
+          nome.toString(),
+          style: TextStyle(
+            fontSize: 20,
+            color: colorText,
+          ),
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          if (valor != null) {
+            display += valor.toString();
+          } else if (nome == 'AC') {
+            display = '';
+          } else if (nome == '+' ||
+              nome == '-' ||
+              nome == '/' ||
+              nome == 'x' ||
+              nome == '%' ||
+              nome == ',') {
+            setState(() {
+              display += nome.toString();
+            });
+          } else if (nome == '=') {
+            display = display.replaceAll('x', '*');
+
+            Parser p = Parser();
+            Expression exp = p.parse(display);
+            ContextModel cm = ContextModel();
+
+            dynamic eval = exp.evaluate(EvaluationType.REAL, cm);
+            display = eval.toString();
+          }
+        });
+      },
+    );
+  }
+
+  void operacao(text) {}
+}
